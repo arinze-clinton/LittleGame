@@ -32,4 +32,11 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = new Vector3(movementX, 0, movementY);
         rb.AddForce(direction);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Diamond collected");
+        other.GameObject.SetActive(false);
+        audiosource PlayOneShot(collectSound);
+    }
 }
