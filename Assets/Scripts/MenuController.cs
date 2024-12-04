@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuController : MonoBehaviour
+public class MenuController : MonoBehaviour
 {
-    public void OnStart()
+    public void OnStartGame()
     {
-        // Load the first game scene...
         SceneManager.LoadScene(1);
     }
 
-    public void OnQuit()
+    public void OnQuitGame()
     {
-        // Quit the game...
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

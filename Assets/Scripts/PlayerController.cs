@@ -1,22 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed = 1.0f;
 
-    public AudioSource backgroundMusic;
-
     public AudioClip collectSound;
     public AudioClip deathSound;
 
+    public AudioSource backgroundMusic;
+
     public TextMeshProUGUI countText;
-    public TextMeshProUGUI winText;
-    public GameObject winTextObject;
+    public TextMeshProUGUI winLooseText;
 
     private Rigidbody rb;
 
@@ -29,19 +28,14 @@ public class PlayerController : MonoBehaviour
     private int maxCount = 0;
 
     // Start is called before the first frame update
-    private void Start()
+    void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
 
-        // Set the count to zero 
-        count = 0;
         maxCount = GameObject.FindGameObjectsWithTag("Diamond").Length;
 
         SetCountText();
-
-        // Deactivate the Win-Loose Text
-        winTextObject.SetActive(false);
     }
 
     private void OnMove(InputValue movementValue)
@@ -53,7 +47,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update()
+    void Update()
     {
         Vector3 direction = new Vector3(movementX, 0, movementY);
 
@@ -64,44 +58,41 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Diamond"))
         {
-            audioSource.PlayOneShot(collectSound);
-
             other.gameObject.SetActive(false);
 
-            // Add one to the score variable 'count'
-            count = count + 1;
+            audioSource.PlayOneShot(collectSound);
 
-            // Run the 'SetCountText()' function (see below)
+            count++;
+
             SetCountText();
+
+            if (count >= maxCount)
+            {
+                winLooseText.text = "Y I P P I E ! ! ! ! ";
+                winLooseText.color = Color.green;
+
+                Invoke(nameof(BackToMenu), 5f);
+            }
         }
 
         if (other.gameObject.CompareTag("Enemy"))
         {
-            backgroundMusic.Stop();
             audioSource.PlayOneShot(deathSound);
+
+            backgroundMusic.Stop();
 
             rb.isKinematic = true;
 
-            // Set the text value of your 'winText'
-            winText.text = "G A M E   O V E R";
-            winTextObject.SetActive(true);
+            winLooseText.text = "You have been caught!!";
+            winLooseText.color = Color.red;
 
             Invoke(nameof(BackToMenu), 5f);
         }
-
     }
 
     private void SetCountText()
     {
-        countText.text = "Count: " + count.ToString() + " | " + maxCount.ToString();
-
-        if (count >= maxCount)
-        {
-            // Set the text value of your 'winText'
-            winTextObject.SetActive(true);
-
-            Invoke(nameof(BackToMenu), 5f);
-        }
+        countText.text = "Count: " + count + " | " + maxCount;
     }
 
     private void BackToMenu()
